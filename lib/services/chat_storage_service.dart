@@ -72,6 +72,17 @@ class ChatStorageService extends GetxService {
   set defaultTemperature(double value) =>
       _settingsBox.put('temperature', value);
 
+  int get contextSize =>
+      (_settingsBox.get('context_size', defaultValue: 4096) as num).toInt();
+
+  set contextSize(int value) => _settingsBox.put('context_size', value);
+
+  bool get traditionalChinese =>
+      _settingsBox.get('traditional_chinese', defaultValue: true) as bool;
+
+  set traditionalChinese(bool value) =>
+      _settingsBox.put('traditional_chinese', value);
+
   String get lastModelId =>
       _settingsBox.get('last_model_id', defaultValue: '') as String;
 

@@ -4,6 +4,7 @@
 .buildlog
 .flutter-plugins
 .flutter-plugin-dependencies
+.flutter-plugins-dependencies
 .packages
 
 # Build outputs

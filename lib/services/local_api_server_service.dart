@@ -31,6 +31,7 @@ class LocalApiServerService extends GetxService {
     }
     return 'http://$defaultHost:${port.value}/v1';
   }
+
   bool get isBusy => _llm.isGenerating.value;
   bool get hasLoadedModel => _llm.isLoaded.value;
   String get modelId => _llm.publicModelId;
@@ -59,11 +60,7 @@ class LocalApiServerService extends GetxService {
           ? InternetAddress.anyIPv4
           : InternetAddress.loopbackIPv4;
 
-      _server = await HttpServer.bind(
-        bindAddress,
-        nextPort,
-        shared: false,
-      );
+      _server = await HttpServer.bind(bindAddress, nextPort, shared: false);
       port.value = nextPort;
       _storage.localApiServerPort = nextPort;
       _storage.localApiServerEnabled = true;
@@ -88,7 +85,7 @@ class LocalApiServerService extends GetxService {
       _server = null;
       isRunning.value = false;
       errorMessage.value = e.toString();
-      // Do not rethrow here, so that app initialization can continue 
+      // Do not rethrow here, so that app initialization can continue
       // even if the local API server fails to bind.
     } finally {
       isStarting.value = false;
@@ -136,13 +133,19 @@ class LocalApiServerService extends GetxService {
         type: InternetAddressType.IPv4,
         includeLoopback: false,
       );
+      String? fallback;
       for (final iface in interfaces) {
         for (final addr in iface.addresses) {
-          if (!addr.isLoopback) {
+          if (addr.isLoopback) continue;
+          fallback ??= addr.address;
+          if (addr.address.startsWith('192.168.') ||
+              addr.address.startsWith('10.') ||
+              addr.address.startsWith('172.')) {
             return addr.address;
           }
         }
       }
+      return fallback;
     } catch (_) {}
     return null;
   }

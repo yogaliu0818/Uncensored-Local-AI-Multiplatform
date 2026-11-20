@@ -61,7 +61,9 @@ class LlmService extends GetxService {
   /// Load a GGUF model from [path] with progress tracking.
   Future<void> loadModel(String path) async {
     LogService? log;
-    try { log = Get.find<LogService>(); } catch (_) {}
+    try {
+      log = Get.find<LogService>();
+    } catch (_) {}
 
     // Verify file exists first
     final file = File(path);
@@ -147,13 +149,12 @@ class LlmService extends GetxService {
         return;
       }
 
-      // Use smaller context on Android to prevent OOM kills.
-      // Desktop can handle 2048, but Android devices with limited RAM
-      // need 1024 to avoid the Low Memory Killer (LMK).
-      final contextSize = Platform.isAndroid ? 1024 : 2048;
-
       // Map the string backend to GpuBackend enum
       final storage = Get.find<ChatStorageService>();
+      // Android keeps a conservative cap; desktop uses the user setting.
+      final contextSize = Platform.isAndroid
+          ? storage.contextSize.clamp(1024, 2048).toInt()
+          : storage.contextSize.clamp(2048, 32768).toInt();
       GpuBackend parsedBackend;
       switch (storage.backendType) {
         case 'vulkan':
@@ -162,6 +163,9 @@ class LlmService extends GetxService {
         case 'opencl':
           parsedBackend = GpuBackend.opencl;
           break;
+        case 'cuda':
+          parsedBackend = GpuBackend.cuda;
+          break;
         default:
           parsedBackend = GpuBackend.cpu;
       }
@@ -169,16 +173,23 @@ class LlmService extends GetxService {
       // Read gpu layers
       final userGpuLayers = storage.gpuLayers;
 
-      // Optimize threads: 4 for both generation and batch processing to keep memory stable.
+      // Desktop CPUs benefit from more parallel work while mobile keeps the
+      // conservative setting to avoid heat and memory pressure.
+      final inferenceThreads = Platform.isAndroid
+          ? (Platform.numberOfProcessors > 4 ? 4 : 0)
+          : Platform.numberOfProcessors.clamp(4, 8).toInt();
       final params = ModelParams(
         contextSize: contextSize,
-        gpuLayers: userGpuLayers, 
+        gpuLayers: userGpuLayers,
         preferredBackend: parsedBackend,
-        numberOfThreads: Platform.numberOfProcessors > 4 ? 4 : 0, 
-        numberOfThreadsBatch: Platform.numberOfProcessors > 4 ? 4 : 0,
+        numberOfThreads: inferenceThreads,
+        numberOfThreadsBatch: inferenceThreads,
       );
 
-      log?.info('Backend=$parsedBackend, GPU layers=$userGpuLayers, ctx=$contextSize, threads=${Platform.numberOfProcessors > 4 ? 4 : 0}', source: 'LLM');
+      log?.info(
+        'Backend=$parsedBackend, GPU layers=$userGpuLayers, ctx=$contextSize, threads=$inferenceThreads',
+        source: 'LLM',
+      );
 
       await _engine!.loadModel(path, modelParams: params);
       progressTimer.cancel();
@@ -282,8 +293,14 @@ class LlmService extends GetxService {
     String buffer = '';
 
     try {
-      // Build the full prompt from messages
-      final prompt = _buildPrompt(messages, systemPrompt);
+      // Keep room for the answer before the native tokenizer sees the prompt.
+      final storage = Get.find<ChatStorageService>();
+      final fittedMessages = await _fitMessagesToContext(
+        messages,
+        systemPrompt,
+        storage.contextSize,
+      );
+      final prompt = _buildPrompt(fittedMessages, systemPrompt);
 
       await for (final token in _engine!.generate(prompt)) {
         tokenCount++;
@@ -342,6 +359,27 @@ class LlmService extends GetxService {
       lastGenerationSpeed.value = tokensPerSecond.value;
       isGenerating.value = false;
     }
+  }
+
+  Future<List<Map<String, String>>> _fitMessagesToContext(
+    List<Map<String, String>> messages,
+    String? systemPrompt,
+    int contextSize,
+  ) async {
+    final result = messages
+        .map((message) => Map<String, String>.from(message))
+        .toList();
+    const reservedForAnswer = 512;
+    while (result.length > 1) {
+      final tokens = await countTokens(_buildPrompt(result, systemPrompt));
+      if (tokens == 0 || tokens <= contextSize - reservedForAnswer) break;
+      // Remove complete old turns but keep the current request.
+      result.removeAt(0);
+      if (result.isNotEmpty && result.first['role'] == 'assistant') {
+        result.removeAt(0);
+      }
+    }
+    return result;
   }
 
   /// Generate a chat completion using llamadart's chat-template API.

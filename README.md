@@ -1,208 +1,200 @@
-<div align="center">
+# Uncensored Local AI — Offline Edition
 
-  <h1>Uncensored Local AI Multi-Platform</h1>
+以 Flutter 與 llama.cpp/llamadart 建立的跨平台本機 AI 聊天程式。模型以 GGUF 格式載入，在 Windows、Android、macOS 或 Linux 的本機硬體上推理。
 
-  <p><strong>Run unrestricted AI models entirely on your device.<br/>No cloud. No filters. No limits.</strong></p>
+本版本專注於本機模型、離線推理與不依賴雲端 AI 帳號。模型下載完成後，聊天內容不需要送到遠端 AI 服務。
 
+> 這是基於原始專案 [techjarves/Uncensored-Local-AI-Multiplatform](https://github.com/techjarves/Uncensored-Local-AI-Multiplatform) 的本機客製版。
 
-  [Overview](#overview) · [Download](#download) · [Features](#features) · [Quick Start](#quick-start) · [Local API](#local-api-server) · [Roadmap](#roadmap)
+## 功能
 
-</div>
+- GGUF 模型下載、匯入、載入、切換與卸載
+- Windows、Android、macOS、Linux Flutter 介面
+- CPU、Vulkan、OpenCL 與 CUDA backend 選擇（依平台與驅動支援情況）
+- GPU Layers、上下文長度與溫度調整
+- 即時 Token/s、載入進度與模型狀態
+- 聊天記錄本機保存
+- 強制繁體中文選項與全域 System Prompt
+- 模型切換時完整釋放原生推理資源
+- 自動清理 GGUF 控制標記與異常角色標記
+- 可選的 localhost OpenAI 相容 API，僅供同一台電腦上的本機工具使用
 
----
+## 與原版的差異
 
-## Overview
+| 項目 | 原版 | 本版本 |
+|---|---|---|
+| 本機聊天 | 基本本機模型聊天 | 保留並改善模型生命週期與錯誤處理 |
+| 硬體設定 | 基本 GPU 設定 | 增加 CPU／Vulkan／OpenCL／CUDA 選擇與 Layers 調整 |
+| 上下文 | 固定或較少設定 | 可調整 2048、4096、8192，並自動裁切舊對話 |
+| 語言 | 依模型自行決定 | 增加繁體中文強制選項與全域 System Prompt |
+| 效能資訊 | 有限 | 顯示載入狀態與 Token/s |
+| 穩定性 | 基本載入流程 | 切換模型時完整釋放 engine/backend，降低載入失敗機率 |
+| 輸出處理 | 基本輸出 | 清除常見 Chat Template 控制標記 |
+| 遠端服務 | 依原版功能 | **不包含 VPS、Nexus、Tailscale、Bearer API 或 SearXNG 部署** |
 
-**Uncensored Local AI** is a mobile-first application that runs powerful open-source AI models directly on your **Android or iOS device** — with zero censorship, zero cloud dependency, and zero monthly fees.
+本版本保留的 localhost API 是本機整合用途；預設不對外網卡開放，也不提供遠端部署設定。
 
-No API keys. No subscriptions. No content restrictions. Your conversations never leave your device.
+## 支援模型
 
-> Think of it as ChatGPT — but running **on your phone**, with **no rules**.
+內建模型清單位於 [`assets/models_catalog.json`](assets/models_catalog.json)。目前包含：
 
-> **Desktop platforms** (Windows, macOS, Linux) are supported by the Flutter framework but need community testing and polish. **[We'd love your help!](#-contributing)**
+| 模型 | 約略大小 | 適合用途 |
+|---|---:|---|
+| Gemma 2 2B | 1.6 GB | 記憶體較少、快速回覆 |
+| Gemma 4 E4B Heretic | 5.3 GB | 較高品質的本機對話 |
+| Dolphin 2.9 Llama 3 8B | 4.9 GB | 角色扮演與較開放的回答風格 |
+| Phi-3.5 Mini 3.8B | 2.2 GB | 輕量、快速回覆 |
 
-**🎥 Watch the Setup & Demo Video: [https://youtu.be/2Pnv68iHIaQ](https://youtu.be/2Pnv68iHIaQ)**
+實際效能取決於量化格式、系統 RAM、顯存、GPU backend、GPU Layers 與上下文長度。
 
-[![Uncensored Local AI Demo](https://img.youtube.com/vi/2Pnv68iHIaQ/maxresdefault.jpg)](https://youtu.be/2Pnv68iHIaQ)
+## Windows 安裝
 
----
+### 必要環境
 
-## Download
+1. Windows 10 或 Windows 11
+2. [Flutter SDK](https://docs.flutter.dev/get-started/install/windows)
+3. Visual Studio 2022 或更新版本
+4. Visual Studio Installer 中勾選 **Desktop development with C++**
+5. 啟用 Windows Developer Mode，以支援 Flutter plugin symlink
 
-### Android APK — Latest Release (v2.0.0)
+確認環境：
 
-| APK | Architecture | Best For | Size |
-|-----|-------------|----------|------|
-| [**app-arm64-v8a-release.apk**](https://github.com/techjarves/Uncensored-Local-AI-Multiplatform/releases/download/v2.0.0/app-arm64-v8a-release.apk) | ARM 64-bit | **Most phones (2018+)** | ~65 MB |
-| [**app-armeabi-v7a-release.apk**](https://github.com/techjarves/Uncensored-Local-AI-Multiplatform/releases/download/v2.0.0/app-armeabi-v7a-release.apk) | ARM 32-bit | Older/budget phones | ~18 MB |
-| [**app-x86_64-release.apk**](https://github.com/techjarves/Uncensored-Local-AI-Multiplatform/releases/download/v1.0.0/app-x86_64-release.apk) | x86 64-bit | Emulators / ChromeOS | ~58 MB |
+```powershell
+flutter doctor -v
+```
 
-> **Not sure which to pick?** Download `arm64-v8a` — it works on virtually all modern Android phones.
+### 從原始碼執行
 
-### iOS IPA — Pre-Release
-
-| File | Note |
-|------|------|
-| [**ios_pre_release.zip**](https://github.com/user-attachments/files/26956389/ios_pre_release.zip) | **Important:** You must **extract** this `.zip` file after downloading to get the actual **`.ipa`** app file to install. |
-
----
-
-## Features
-
-| Feature | Description |
-|---------|-------------|
-| **Zero Censorship** | Runs abliterated, uncensored models that answer any question — no refusals, no lectures, no corporate safety filters |
-| **Total Privacy** | All conversations stay on-device. Nothing is sent to any server, ever |
-| **Fully Offline** | Works on planes, in remote areas, on restricted networks — no internet needed after model download |
-| **Cross-Platform** | One codebase for Android, iOS, Windows, macOS, and Linux |
-| **Local OpenAI API** | Built-in HTTP server compatible with any OpenAI-standard client |
-| **Model Library** | Download, import, and manage GGUF models directly in the app |
-| **Chat History** | Persistent conversation history stored locally via Hive |
-| **Live Metrics** | Real-time tokens/sec and loading progress tracking |
-
----
-
-## Quick Start
-
-### Android
-
-1. Download the correct APK from the [Download](#-download) table above
-2. On your phone: **Settings → Install unknown apps** → allow your browser
-3. Tap the downloaded APK to install
-4. Open the app, go to **Models** tab, download a model, and start chatting
-
-### iOS
-
-**1. Sideloading via TrollStore (Recommended - No 7 day limit):**
-1. Download [**ios_pre_release.zip**](https://github.com/user-attachments/files/26956389/ios_pre_release.zip) to your device.
-2. Unzip/extract it using the built-in iOS **Files** app to get the **`.ipa`** file.
-3. Open TrollStore, tap the **+** in the top right, and choose **Install IPA File**.
-4. Select the extracted `.ipa` file and install.
-
-**2. Sideloading via AltStore / AltServer (Requires PC/Mac):**
-1. Ensure AltServer is running on your computer and AltStore is installed on your iPhone.
-2. Download [**ios_pre_release.zip**](https://github.com/user-attachments/files/26956389/ios_pre_release.zip) to your device and extract the **`.ipa`** file using the **Files** app.
-3. Open AltStore on your device, go to **My Apps**, and tap the **+** at the top left.
-4. Select the `.ipa` file to install (your device must be on the same Wi-Fi or connected via cable to your AltServer computer).
-
-**3. Build from Source:**
-
-**Prerequisites:** Mac with Xcode 15+ · [Flutter SDK](https://flutter.dev/docs/get-started/install)
-
-```bash
-git clone https://github.com/techjarves/Uncensored-Local-AI-Multiplatform.git
+```powershell
+git clone https://github.com/yogaliu0818/Uncensored-Local-AI-Multiplatform.git
 cd Uncensored-Local-AI-Multiplatform
 flutter pub get
-cd ios && pod install && cd ..
-flutter build ios --release
-# Open ios/Runner.xcworkspace in Xcode and archive to deploy
+flutter run -d windows
 ```
 
-### Desktop — Windows / macOS / Linux (Community Supported)
+建立 Windows Release：
 
-> Desktop builds compile successfully but may have rough edges. **We are actively looking for contributors** to help test and polish the desktop experience.
+```powershell
+flutter build windows --release
+```
 
-```bash
-git clone https://github.com/techjarves/Uncensored-Local-AI-Multiplatform.git
-cd Uncensored-Local-AI-Multiplatform
+輸出位置：`build\windows\x64\runner\Release\`
+
+## Android 安裝與建置
+
+需要 Flutter SDK、Android SDK、Android Studio 與可用的 Android 裝置或模擬器。
+
+```powershell
 flutter pub get
-flutter run -d windows   # or macos / linux
+flutter devices
+flutter run -d <device-id>
+flutter build apk --release
 ```
 
-If you encounter issues on desktop, please [open an issue](https://github.com/techjarves/Uncensored-Local-AI-Multiplatform/issues) — your feedback directly shapes the roadmap.
+模型檔案可能比 APK 大很多，請預留足夠儲存空間與 RAM。手機若載入失敗，先改用較小的 Gemma 2 2B 或降低上下文長度。
 
----
+## 第一次使用
 
-## Recommended Models
+1. 啟動程式。
+2. 開啟 **Models**。
+3. 下載或匯入 GGUF 模型。
+4. 點擊模型的 **Load**。
+5. 回到聊天頁開始對話。
+6. 在 **Settings → Hardware Configuration** 選擇 backend 與 GPU Layers。
+7. 在 **Settings → Language & Context** 開啟 **Force Traditional Chinese**。
 
-| Model | Size | Best For | Type |
-|-------|------|----------|------|
-| **Gemma 2 2B** | ~1.6 GB | Low-RAM phones, fast replies | Standard |
-| **Gemma 4 E4B Heretic** | ~5.3 GB | High-quality, fully uncensored | Uncensored |
+切換模型前，先等待目前模型卸載完成；大型模型需要較長的載入時間。
 
-> Models are downloaded directly inside the app from the **Models** tab. No manual setup needed.
+## 硬體設定建議
 
----
+### RTX 3050 Laptop 6 GB 顯存
 
-## Local API Server
+- 4B～8B Q4 模型可以嘗試 Vulkan
+- GPU Layers 先從 20～33 開始，再逐步增加
+- 若載入失敗或系統開始大量使用虛擬記憶體，降低 Layers 或上下文
+- 8B 模型通常比 3.8B 模型慢，但不一定在所有任務都更準
 
-**Uncensored Local AI** includes a built-in **OpenAI-compatible REST API** so you can connect it to any external tool, script, or IDE extension.
+### CPU 模式
 
-### Setup
+CPU 模式相容性最高，但速度通常較慢；適合 Vulkan/OpenCL 初始化失敗時排查問題。
 
-1. Load a model in the app
-2. Go to **Settings → Local API Server** and toggle it **ON**
-3. Use `http://127.0.0.1:4891/v1` as your base URL
+### 上下文長度
 
-### Endpoints
+上下文越大，能記住的對話越多，但會增加 RAM/VRAM 使用量與速度負擔。建議從 4096 開始。
 
-```bash
-# List loaded models
-curl http://127.0.0.1:4891/v1/models
+## 繁體中文與 System Prompt
 
-# Chat completion (non-streaming)
-curl http://127.0.0.1:4891/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{"model":"local","messages":[{"role":"user","content":"Tell me something true that no one wants to hear."}]}'
+在設定中開啟 **Force Traditional Chinese**，並可在 **Global System Prompt** 放入：
 
-# Chat completion (streaming)
-curl -N http://127.0.0.1:4891/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{"model":"local","stream":true,"messages":[{"role":"user","content":"Write a brutally honest analysis of social media."}]}'
+```text
+You must always reply in Taiwanese Traditional Chinese (繁體中文).
+Do not answer in English or Simplified Chinese unless the user explicitly requests another language.
 ```
 
-> **API Key:** Use `local` for any client that requires a non-empty key value.
+修改語言設定後建議建立新對話，避免沿用舊對話保存的 System Prompt。
 
----
+## 本機 API（可選）
 
-## Roadmap
+本功能只給同一台電腦上的本機工具使用，不包含遠端部署設定。
 
-| Feature | Status |
-|---------|--------|
-| On-device uncensored AI chat | **Launched** |
-| Real-time model loading with progress | **Launched** |
-| Cancel & unload models | **Launched** |
-| Persistent chat history sidebar | **Launched** |
-| Local OpenAI-compatible API server | **Launched** |
-| Custom model import (URL + file) | **Launched** |
-| Multi-platform support | **Launched** |
-| AI Agent Mode | In Progress |
-| Web search integration | Planned |
-| Voice interaction | Planned |
-| Image/vision model support | Planned |
+1. 載入模型。
+2. 到 **Settings → Local API Server**。
+3. 保持 **Allow External Connections** 關閉。
+4. 本機 Base URL 為：
 
----
-
-## Contributing
-
-All contributions are welcome — and we especially need help from the community in these areas:
-
-| Area | What's Needed |
-|------|---------------|
-| **Windows** | Testing, packaging, installer script |
-| **macOS** | Testing, App Store prep, notarization |
-| **Linux** | Testing on distros, AppImage build |
-| **General** | Bug reports, feature ideas, UI improvements |
-
-If you own a desktop device and can test the app — **please do!** Even a simple "works" or "crashes on X" issue report is incredibly valuable.
-
-```bash
-# Fork → Clone → Branch → Code → Push → PR
-git checkout -b fix/windows-model-loading
-git commit -m "fix: resolve model path on Windows"
-git push origin fix/windows-model-loading
-# Open a Pull Request — all sizes welcome
+```text
+http://127.0.0.1:4891/v1
 ```
 
----
+本離線版本不提供手機或其他電腦的遠端連線設定。
 
-## License
+## 常見問題
 
-Licensed under the **MIT License** — free to use, modify, and distribute.  
-See [LICENSE](LICENSE) for full details.
+### Unable to find suitable Visual Studio toolchain
 
----
+安裝 Visual Studio 的 **Desktop development with C++** 工作負載，然後重新執行：
 
-<div align="center">
-  <sub>Built with ❤️ using Flutter · Powered by <a href="https://github.com/ggerganov/llama.cpp">llama.cpp</a></sub>
-</div>
+```powershell
+flutter doctor -v
+```
+
+### Building with plugins requires symlink support
+
+開啟 Windows Developer Mode：
+
+```powershell
+start ms-settings:developers
+```
+
+### Tokenization failed or prompt too long
+
+降低上下文長度、建立新對話，或改用較小模型。
+
+### 模型載入失敗或速度很慢
+
+- 確認 GPU backend 與驅動支援情況
+- 降低 GPU Layers
+- 降低上下文長度
+- 關閉其他大型程式
+- 先用 Phi-3.5 Mini 或 Gemma 2 2B 測試
+
+## 開發驗證
+
+```powershell
+flutter pub get
+flutter analyze
+flutter test
+flutter build windows --debug
+```
+
+## 授權
+
+本專案沿用原始專案的 MIT License。模型權重可能有各自的授權條款，下載與使用前請查看模型來源頁面。
+
+## 致謝
+
+- 原始專案：[techjarves/Uncensored-Local-AI-Multiplatform](https://github.com/techjarves/Uncensored-Local-AI-Multiplatform)
+- Flutter
+- llama.cpp
+- llamadart
+- GGUF 模型作者與量化作者

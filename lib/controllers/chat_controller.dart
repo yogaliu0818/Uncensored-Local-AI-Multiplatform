@@ -89,6 +89,15 @@ class ChatController extends GetxController {
     _storage.saveChat(chat);
     chats.refresh();
 
+    var prompt = chat.systemPrompt.isNotEmpty
+        ? chat.systemPrompt
+        : systemPrompt.value;
+    if (_storage.traditionalChinese) {
+      prompt =
+          '$prompt\n\nAlways answer in Taiwanese Traditional Chinese (繁體中文). '
+          'Do not use Simplified Chinese unless the user explicitly requests it.';
+    }
+
     // Build message history for LLM
     final history = chat.messages
         .where((m) => !m.isSystem)
@@ -106,9 +115,7 @@ class ChatController extends GetxController {
     try {
       final stream = _llm.generate(
         messages: history,
-        systemPrompt: chat.systemPrompt.isNotEmpty
-            ? chat.systemPrompt
-            : systemPrompt.value,
+        systemPrompt: prompt,
         temperature: temperature.value,
       );
 
@@ -125,11 +132,14 @@ class ChatController extends GetxController {
     } finally {
       // Clean up any trailing stop tokens or whitespace
       aiMsg.content = aiMsg.content
-          .replaceAll(RegExp(
-            r'<\|end\|>|<\|eot_id\|>|<\|endoftext\|>|<\|im_end\|>|<\|im_start\|>'
-            r'|<end_of_turn>|<start_of_turn>|<\|assistant\|>|<\|user\|>|<\|system\|>'
-            r'|<\|pad\|>|</s>|<s>|\[INST\]|\[/INST\]|\[end\]'
-          ), '')
+          .replaceAll(
+            RegExp(
+              r'<\|end\|>|<\|eot_id\|>|<\|endoftext\|>|<\|im_end\|>|<\|im_start\|>'
+              r'|<end_of_turn>|<start_of_turn>|<\|assistant\|>|<\|user\|>|<\|system\|>'
+              r'|<\|pad\|>|</s>|<s>|\[INST\]|\[/INST\]|\[end\]',
+            ),
+            '',
+          )
           .trim();
       isGenerating.value = false;
       streamedResponse.value = '';
