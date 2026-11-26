@@ -474,6 +474,25 @@ class LlmService extends GetxService {
     List<Map<String, String>> messages,
     String? systemPrompt,
   ) {
+    final filename = loadedModelFilename.toLowerCase();
+    if (filename.contains('dolphin')) {
+      return _buildChatMlPrompt(messages, systemPrompt);
+    }
+    if (filename.contains('gemma')) {
+      return _buildGemmaPrompt(messages, systemPrompt);
+    }
+    if (filename.contains('llama-3') || filename.contains('llama3')) {
+      return _buildLlama3Prompt(messages, systemPrompt);
+    }
+
+    // Phi and older/custom models commonly use this simple role format.
+    return _buildRolePrompt(messages, systemPrompt);
+  }
+
+  String _buildRolePrompt(
+    List<Map<String, String>> messages,
+    String? systemPrompt,
+  ) {
     final buffer = StringBuffer();
 
     if (systemPrompt != null && systemPrompt.isNotEmpty) {
@@ -491,6 +510,72 @@ class LlmService extends GetxService {
     }
 
     buffer.writeln('<|assistant|>');
+    return buffer.toString();
+  }
+
+  /// Dolphin 2.9 was fine-tuned with the ChatML format.
+  String _buildChatMlPrompt(
+    List<Map<String, String>> messages,
+    String? systemPrompt,
+  ) {
+    final buffer = StringBuffer();
+    void addMessage(String role, String content) {
+      buffer.writeln('<|im_start|>$role');
+      buffer.writeln(content);
+      buffer.writeln('<|im_end|>');
+    }
+
+    if (systemPrompt != null && systemPrompt.isNotEmpty) {
+      addMessage('system', systemPrompt);
+    }
+    for (final msg in messages) {
+      addMessage(msg['role'] ?? 'user', msg['content'] ?? '');
+    }
+    buffer.write('<|im_start|>assistant\n');
+    return buffer.toString();
+  }
+
+  /// Gemma instruction models use start/end-of-turn markers.
+  String _buildGemmaPrompt(
+    List<Map<String, String>> messages,
+    String? systemPrompt,
+  ) {
+    final buffer = StringBuffer();
+    void addTurn(String role, String content) {
+      buffer.writeln('<start_of_turn>$role');
+      buffer.writeln(content);
+      buffer.writeln('<end_of_turn>');
+    }
+
+    if (systemPrompt != null && systemPrompt.isNotEmpty) {
+      addTurn('system', systemPrompt);
+    }
+    for (final msg in messages) {
+      addTurn(msg['role'] ?? 'user', msg['content'] ?? '');
+    }
+    buffer.write('<start_of_turn>model\n');
+    return buffer.toString();
+  }
+
+  /// Llama 3 instruct models use header and end-of-turn tokens.
+  String _buildLlama3Prompt(
+    List<Map<String, String>> messages,
+    String? systemPrompt,
+  ) {
+    final buffer = StringBuffer('<|begin_of_text|>');
+    void addMessage(String role, String content) {
+      buffer.write('<|start_header_id|>$role<|end_header_id|>\n\n');
+      buffer.write(content);
+      buffer.write('<|eot_id|>');
+    }
+
+    if (systemPrompt != null && systemPrompt.isNotEmpty) {
+      addMessage('system', systemPrompt);
+    }
+    for (final msg in messages) {
+      addMessage(msg['role'] ?? 'user', msg['content'] ?? '');
+    }
+    buffer.write('<|start_header_id|>assistant<|end_header_id|>\n\n');
     return buffer.toString();
   }
 
