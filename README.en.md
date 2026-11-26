@@ -2,21 +2,23 @@
 
 [繁體中文](README.md)
 
-A cross-platform local AI chat application built with Flutter and `llamadart`／`llama.cpp`. GGUF models run on your own computer or Android device without a paid cloud AI API.
+A chat application that runs AI models on your own computer or phone. Use less-restricted models for open-ended conversations without sending your chats to the cloud or paying for an API.
 
 > This project is a customized version based on [techjarves/Uncensored-Local-AI-Multiplatform](https://github.com/techjarves/Uncensored-Local-AI-Multiplatform).
 
-## Features
+## What can it do?
 
-- Download, import, load, switch, and unload GGUF models
-- Windows, Android, macOS, and Linux support
-- CPU, Vulkan, OpenCL, and CUDA backends when supported
-- Adjustable GPU Layers, context size, and temperature
-- Token/s, model loading progress, and runtime status
-- Local chat history storage
-- Traditional Chinese response enforcement and a global system prompt
-- UI languages: Traditional Chinese, English, Japanese, Korean, Spanish, French, and German
-- Optional localhost OpenAI-compatible API
+- **Open-ended conversations**: use uncensored or less-restricted local models, depending on the model itself.
+- **Runs locally**: the model runs on your own computer or phone, and chats are not sent to the cloud by default.
+- **No paid API required**: once a model is downloaded, it can run offline without cloud API credits.
+- **Works across platforms**: Windows, Android, macOS, and Linux.
+- **Choose your models**: download, import, load, switch, and delete GGUF models.
+- **Multiple interface languages**: Traditional Chinese, English, Japanese, Korean, Spanish, French, and German.
+- **Traditional Chinese conversations**: optionally force replies to use Taiwan Traditional Chinese.
+- **Performance controls**: adjust GPU Layers, context size, and CPU／Vulkan／OpenCL／CUDA backends.
+- **Local chat history**: conversations are stored on your own device by default.
+
+Advanced users can optionally enable a localhost API so other tools on the same computer can use the loaded model.
 
 ## Differences from upstream
 

@@ -2,21 +2,23 @@
 
 [English](README.en.md)
 
-使用 Flutter 與 `llamadart`／`llama.cpp` 建立的跨平台本機 AI 聊天程式。模型以 GGUF 格式在自己的電腦或 Android 手機上執行，不需要付費雲端 AI API。
+在自己的電腦或手機上執行 AI 模型的聊天程式。你可以使用較少限制的模型進行自由對話，不需要把聊天內容送到雲端，也不需要付費 API。
 
 > 本專案是基於 [techjarves/Uncensored-Local-AI-Multiplatform](https://github.com/techjarves/Uncensored-Local-AI-Multiplatform) 的客製版本。
 
-## 功能
+## 這個程式可以做什麼？
 
-- GGUF 模型下載、匯入、載入、切換與卸載
-- Windows、Android、macOS、Linux
-- CPU、Vulkan、OpenCL 與 CUDA backend（依平台與驅動支援情況）
-- GPU Layers、上下文長度與 Temperature 調整
-- Token/s、模型載入進度與狀態顯示
-- 聊天記錄儲存在本機
-- 繁體中文強制回覆與全域 System Prompt
-- 介面語言：繁體中文、英文、日文、韓文、西班牙文、法文、德文
-- 可選的 localhost OpenAI 相容 API
+- **自由對話**：使用無審查或較少限制的本機模型，依模型本身的設定進行對話。
+- **完全本機運行**：模型在自己的電腦或手機上執行，聊天內容預設不會送到雲端。
+- **不用付費 API**：下載模型後即可離線使用，不需要購買 OpenAI 或其他雲端服務的 API 額度。
+- **多平台使用**：支援 Windows、Android、macOS 與 Linux。
+- **模型自由切換**：可以下載、匯入、載入、切換與刪除 GGUF 模型。
+- **多語言介面**：支援繁體中文、英文、日文、韓文、西班牙文、法文與德文。
+- **繁體中文對話**：可以設定強制使用台灣繁體中文回覆。
+- **效能調整**：可調整 GPU Layers、上下文長度、CPU／Vulkan／OpenCL／CUDA 等運算方式。
+- **聊天記錄留在本機**：對話資料預設儲存在自己的裝置上。
+
+進階使用者也可以開啟 localhost API，讓同一台電腦上的其他工具連接目前載入的模型。
 
 ## 與原版的差異
 
