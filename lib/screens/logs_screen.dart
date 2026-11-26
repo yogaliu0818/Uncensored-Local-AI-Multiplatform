@@ -49,7 +49,7 @@ class LogsScreen extends StatelessWidget {
                   // Copy all logs
                   IconButton(
                     icon: Icon(Icons.copy_rounded, size: 20, color: context.textM),
-                    tooltip: 'Copy all logs',
+                  tooltip: 'Copy all logs'.tr,
                     onPressed: () {
                       final text = logService.exportAll();
                       Clipboard.setData(ClipboardData(text: text));
@@ -64,7 +64,7 @@ class LogsScreen extends StatelessWidget {
                   // Clear logs
                   IconButton(
                     icon: Icon(Icons.delete_outline_rounded, size: 20, color: context.textD),
-                    tooltip: 'Clear logs',
+                  tooltip: 'Clear logs'.tr,
                     onPressed: () {
                       logService.clear();
                       Get.snackbar(
@@ -148,7 +148,7 @@ class LogsScreen extends StatelessWidget {
                   );
                 },
                 icon: const Icon(Icons.share_rounded, size: 18),
-                label: const Text('Copy Logs to Share'),
+                label: Text('Copy Logs to Share'.tr),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.accent,
                   foregroundColor: Colors.white,

@@ -124,8 +124,8 @@ class ChatBubble extends StatelessWidget {
                   onTap: () {
                     Clipboard.setData(ClipboardData(text: message.content));
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Copied to clipboard'),
+                      SnackBar(
+                        content: Text('Copied to clipboard'.tr),
                         duration: Duration(seconds: 1),
                         behavior: SnackBarBehavior.floating,
                       ),
@@ -139,7 +139,7 @@ class ChatBubble extends StatelessWidget {
                       children: [
                         Icon(Icons.copy_rounded, size: 14, color: context.textD),
                         const SizedBox(width: 4),
-                        Text('Copy', style: TextStyle(fontSize: 12, color: context.textD)),
+                        Text('Copy'.tr, style: TextStyle(fontSize: 12, color: context.textD)),
                       ],
                     ),
                   ),

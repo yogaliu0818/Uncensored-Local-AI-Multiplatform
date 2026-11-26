@@ -337,7 +337,7 @@ class _ModelLibraryBodyState extends State<_ModelLibraryBody> {
       AlertDialog(
         backgroundColor: context.bgPanel,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Delete Model File', style: TextStyle(color: context.text)),
+          title: Text('Delete Model File'.tr, style: TextStyle(color: context.text)),
         content: Text(
           'Delete ${model.name}? (${model.sizeGb} GB will be freed)',
           style: TextStyle(color: context.textM),
@@ -345,7 +345,7 @@ class _ModelLibraryBodyState extends State<_ModelLibraryBody> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text('Cancel', style: TextStyle(color: context.textD)),
+          child: Text('Cancel'.tr, style: TextStyle(color: context.textD)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -356,7 +356,7 @@ class _ModelLibraryBodyState extends State<_ModelLibraryBody> {
               backgroundColor: AppColors.red,
               elevation: 0,
             ),
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+          child: Text('Delete'.tr, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -383,7 +383,7 @@ class _ModelLibraryBodyState extends State<_ModelLibraryBody> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text('Cancel', style: TextStyle(color: context.textD)),
+          child: Text('Cancel'.tr, style: TextStyle(color: context.textD)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -399,7 +399,7 @@ class _ModelLibraryBodyState extends State<_ModelLibraryBody> {
               backgroundColor: AppColors.red,
               elevation: 0,
             ),
-            child: const Text('Remove', style: TextStyle(color: Colors.white)),
+          child: Text('Remove'.tr, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -477,8 +477,8 @@ class _ImportButton extends StatelessWidget {
                 context,
                 icon: Icons.file_open_rounded,
                 color: AppColors.accentHi,
-                title: 'Import .gguf File',
-                subtitle: 'Select a single model file',
+          title: 'Import .gguf File'.tr,
+          subtitle: 'Select a single model file'.tr,
                 onTap: () {
                   Navigator.pop(context);
                   ctrl.importModelFromFile();
@@ -488,8 +488,8 @@ class _ImportButton extends StatelessWidget {
                 context,
                 icon: Icons.folder_open_rounded,
                 color: AppColors.green,
-                title: 'Import from Folder',
-                subtitle: 'Scan folder for .gguf files',
+          title: 'Import from Folder'.tr,
+          subtitle: 'Scan folder for .gguf files'.tr,
                 onTap: () {
                   Navigator.pop(context);
                   ctrl.importFromDirectory();
@@ -499,8 +499,8 @@ class _ImportButton extends StatelessWidget {
                 context,
                 icon: Icons.link_rounded,
                 color: AppColors.orange,
-                title: 'Add from URL',
-                subtitle: 'Download a .gguf model from a URL',
+          title: 'Add from URL'.tr,
+          subtitle: 'Download a .gguf model from a URL'.tr,
                 onTap: () {
                   Navigator.pop(context);
                   _showAddUrlDialog(context);

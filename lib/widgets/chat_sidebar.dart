@@ -33,8 +33,8 @@ class ChatSidebar extends StatelessWidget {
               child: ElevatedButton.icon(
                 onPressed: onNewChat,
                 icon: const Icon(Icons.add_rounded, size: 18),
-                label: const Text(
-                  'New Chat',
+                label: Text(
+                  'New Chat'.tr,
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                 ),
                 style: ElevatedButton.styleFrom(
@@ -64,7 +64,7 @@ class ChatSidebar extends StatelessWidget {
                     Icon(Icons.chat_bubble_outline, size: 36, color: context.textD),
                     const SizedBox(height: 12),
                     Text(
-                      'No chats yet',
+                      'No chats yet'.tr,
                       style: TextStyle(fontSize: 13, color: context.textD),
                     ),
                   ],
@@ -143,7 +143,7 @@ class ChatSidebar extends StatelessWidget {
               Icon(Icons.save_outlined, size: 14, color: context.textD),
               const SizedBox(width: 8),
               Text(
-                'Chats saved locally',
+                'Chats saved locally'.tr,
                 style: TextStyle(fontSize: 11, color: context.textD),
               ),
             ],
@@ -160,7 +160,7 @@ class ChatSidebar extends StatelessWidget {
         backgroundColor: context.bgPanel,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
-          'Delete Chat',
+          'Delete Chat'.tr,
           style: TextStyle(
             color: context.text,
             fontSize: 16,
@@ -168,13 +168,13 @@ class ChatSidebar extends StatelessWidget {
           ),
         ),
         content: Text(
-          'Delete "$chatTitle"?\nThis action cannot be undone.',
+          '${'Delete'.tr} "$chatTitle"?\n${'This action cannot be undone.'.tr}',
           style: TextStyle(color: context.textM, fontSize: 14),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel', style: TextStyle(color: context.textD)),
+            child: Text('Cancel'.tr, style: TextStyle(color: context.textD)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -186,7 +186,7 @@ class ChatSidebar extends StatelessWidget {
               elevation: 0,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: Text('Delete'.tr, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),

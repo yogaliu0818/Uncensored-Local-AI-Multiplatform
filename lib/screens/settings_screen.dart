@@ -10,6 +10,8 @@ import '../services/local_api_server_service.dart';
 import '../services/model_manager.dart';
 import '../services/background_optimizer_service.dart';
 import '../services/chat_storage_service.dart';
+import '../controllers/language_controller.dart';
+import '../i18n/app_translations.dart';
 
 class SettingsScreen extends StatelessWidget {
   /// When true, no Scaffold — just the body content for embedding in tabs.
@@ -41,6 +43,7 @@ class _SettingsBody extends StatelessWidget {
     final themeCtrl = Get.find<ThemeController>();
     final apiServer = Get.find<LocalApiServerService>();
     final storage = Get.find<ChatStorageService>();
+    final languageCtrl = Get.find<LanguageController>();
 
     return Column(
       children: [
@@ -68,7 +71,7 @@ class _SettingsBody extends StatelessWidget {
                   ),
                 if (!showBackButton) const SizedBox(width: 16),
                 Text(
-                  'Settings',
+                  'Settings'.tr,
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
@@ -85,21 +88,56 @@ class _SettingsBody extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.all(20),
             children: [
+              _sectionHeader(context, 'Language'.tr),
+              const SizedBox(height: 12),
+              _card(
+                context,
+                child: Obx(
+                  () => ListTile(
+                    leading: Icon(Icons.translate_rounded, color: context.textM),
+                    title: Text('Language'.tr,
+                        style: TextStyle(color: context.text, fontSize: 14)),
+                    subtitle: Text('Restart not required'.tr,
+                        style: TextStyle(color: context.textD, fontSize: 12)),
+                    trailing: DropdownButton<Locale>(
+                      value: AppTranslations.supported.keys.firstWhere(
+                        (locale) => locale.languageCode ==
+                                languageCtrl.locale.languageCode &&
+                            locale.countryCode == languageCtrl.locale.countryCode,
+                        orElse: () => const Locale('zh', 'TW'),
+                      ),
+                      dropdownColor: context.bgPanel,
+                      style: TextStyle(color: context.text),
+                      underline: const SizedBox.shrink(),
+                      items: AppTranslations.supported.entries
+                          .map((entry) => DropdownMenuItem<Locale>(
+                                value: entry.key,
+                                child: Text(entry.value),
+                              ))
+                          .toList(),
+                      onChanged: (locale) {
+                        if (locale != null) languageCtrl.setLocale(locale);
+                      },
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 28),
               // ── Appearance ────────────────────────────────
-              _sectionHeader(context, 'Appearance'),
+              _sectionHeader(context, 'Appearance'.tr),
               const SizedBox(height: 12),
               _card(
                 context,
                 child: Obx(
                   () => SwitchListTile(
                     title: Text(
-                      'Dark Mode',
+                      'Dark Mode'.tr,
                       style: TextStyle(color: context.text, fontSize: 14),
                     ),
                     subtitle: Text(
                       themeCtrl.isDarkMode
-                          ? 'Using dark theme'
-                          : 'Using light theme',
+                          ? 'Using dark theme'.tr
+                          : 'Using light theme'.tr,
                       style: TextStyle(color: context.textD, fontSize: 12),
                     ),
                     secondary: Icon(
@@ -125,11 +163,11 @@ class _SettingsBody extends StatelessWidget {
                   context,
                   child: ListTile(
                     title: Text(
-                      'Battery Optimization',
+                      'Battery Optimization'.tr,
                       style: TextStyle(color: context.text, fontSize: 14),
                     ),
                     subtitle: Text(
-                      'Disable to prevent background killing',
+                      'Disable to prevent background killing'.tr,
                       style: TextStyle(color: context.textD, fontSize: 12),
                     ),
                     trailing: FutureBuilder<bool>(
@@ -166,10 +204,10 @@ class _SettingsBody extends StatelessWidget {
               const SizedBox(height: 28),
 
               // ── System Prompt ─────────────────────────────
-              _sectionHeader(context, 'Global System Prompt'),
+              _sectionHeader(context, 'Global System Prompt'.tr),
               const SizedBox(height: 8),
               Text(
-                'Applied to all new chats. Existing chats keep their own prompt.',
+                'Applied to all new chats. Existing chats keep their own prompt.'.tr,
                 style: TextStyle(fontSize: 12, color: context.textD),
               ),
               const SizedBox(height: 12),
@@ -189,7 +227,7 @@ class _SettingsBody extends StatelessWidget {
                     height: 1.5,
                   ),
                   decoration: InputDecoration(
-                    hintText: 'e.g. You are a helpful assistant...',
+                    hintText: 'e.g. You are a helpful assistant...'.tr,
                     hintStyle: TextStyle(color: context.textD),
                     filled: true,
                     fillColor: context.bgInput,
@@ -216,15 +254,15 @@ class _SettingsBody extends StatelessWidget {
                   onPressed: () {
                     chatCtrl.clearGlobalSystemPrompt();
                     Get.snackbar(
-                      'Cleared',
-                      'Global system prompt removed.',
+                      'Cleared'.tr,
+                      'Global system prompt removed.'.tr,
                       snackPosition: SnackPosition.BOTTOM,
                     );
                   },
                   icon: const Icon(Icons.clear_rounded, size: 16),
                   style: TextButton.styleFrom(foregroundColor: AppColors.red),
-                  label: const Text(
-                    'Clear Prompt',
+                  label: Text(
+                    'Clear Prompt'.tr,
                     style: TextStyle(fontSize: 13),
                   ),
                 ),
@@ -233,7 +271,7 @@ class _SettingsBody extends StatelessWidget {
               const SizedBox(height: 28),
 
               // ── Temperature ───────────────────────────────
-              _sectionHeader(context, 'Temperature'),
+              _sectionHeader(context, 'Temperature'.tr),
               const SizedBox(height: 12),
               _card(
                 context,
@@ -285,23 +323,23 @@ class _SettingsBody extends StatelessWidget {
               const SizedBox(height: 28),
 
               // ── Hardware Configuration ──────────────────────────
-              _sectionHeader(context, 'Hardware Configuration'),
+              _sectionHeader(context, 'Hardware Configuration'.tr),
               const SizedBox(height: 8),
               _HardwareSettingsCard(storage: storage),
 
               const SizedBox(height: 28),
 
-              _sectionHeader(context, 'Language & Context'),
+              _sectionHeader(context, 'Language & Context'.tr),
               const SizedBox(height: 8),
               _LanguageContextSettingsCard(storage: storage),
 
               const SizedBox(height: 28),
 
               // ── Local API Server ──────────────────────────
-              _sectionHeader(context, 'Local API Server'),
+              _sectionHeader(context, 'Local API Server'.tr),
               const SizedBox(height: 8),
               Text(
-                'Expose the loaded model to OpenAI-compatible local clients.',
+                'Expose the loaded model to OpenAI-compatible local clients.'.tr,
                 style: TextStyle(fontSize: 12, color: context.textD),
               ),
               const SizedBox(height: 12),
@@ -334,7 +372,7 @@ class _SettingsBody extends StatelessWidget {
                       children: [
                         SwitchListTile(
                           title: Text(
-                            'Local API server',
+                            'Local API server'.tr,
                             style: TextStyle(color: context.text, fontSize: 14),
                           ),
                           subtitle: Text(
@@ -372,11 +410,11 @@ class _SettingsBody extends StatelessWidget {
                         const SizedBox(height: 12),
                         SwitchListTile(
                           title: Text(
-                            'Allow External Connections',
+                            'Allow External Connections'.tr,
                             style: TextStyle(color: context.text, fontSize: 14),
                           ),
                           subtitle: Text(
-                            'Listen on 0.0.0.0 instead of localhost',
+                            'Listen on 0.0.0.0 instead of localhost'.tr,
                             style: TextStyle(
                               color: context.textD,
                               fontSize: 12,
@@ -558,7 +596,7 @@ class _SettingsBody extends StatelessWidget {
               const SizedBox(height: 28),
 
               // ── Storage ───────────────────────────────────
-              _sectionHeader(context, 'Storage'),
+              _sectionHeader(context, 'Storage'.tr),
               const SizedBox(height: 12),
               _card(
                 context,
@@ -697,7 +735,7 @@ class _SettingsBody extends StatelessWidget {
               const SizedBox(height: 28),
 
               // ── App Logs ──────────────────────────────────
-              _sectionHeader(context, 'Debugging'),
+              _sectionHeader(context, 'Debugging'.tr),
               const SizedBox(height: 8),
               _card(
                 context,
@@ -716,11 +754,11 @@ class _SettingsBody extends StatelessWidget {
                     ),
                   ),
                   title: Text(
-                    'App Logs',
+                    'App Logs'.tr,
                     style: TextStyle(color: context.text, fontSize: 14),
                   ),
                   subtitle: Text(
-                    'View logs, errors & share with developers',
+                    'View logs, errors & share with developers'.tr,
                     style: TextStyle(color: context.textD, fontSize: 12),
                   ),
                   trailing: Icon(
@@ -828,11 +866,11 @@ class _LanguageContextSettingsCardState
         children: [
           SwitchListTile(
             title: Text(
-              'Force Traditional Chinese',
+              'Force Traditional Chinese'.tr,
               style: TextStyle(color: context.text, fontSize: 14),
             ),
             subtitle: Text(
-              'Prefer Taiwan Traditional Chinese for every reply',
+              'Prefer Taiwan Traditional Chinese for every reply'.tr,
               style: TextStyle(color: context.textD, fontSize: 12),
             ),
             value: _traditionalChinese,
@@ -847,11 +885,11 @@ class _LanguageContextSettingsCardState
           ListTile(
             contentPadding: EdgeInsets.zero,
             title: Text(
-              'Context size',
+              'Context size'.tr,
               style: TextStyle(color: context.text, fontSize: 14),
             ),
             subtitle: Text(
-              'Reload the model after changing this value',
+              'Reload the model after changing this value'.tr,
               style: TextStyle(color: context.textD, fontSize: 12),
             ),
             trailing: DropdownButton<int>(
@@ -1004,7 +1042,7 @@ class _HardwareSettingsCardState extends State<_HardwareSettingsCard> {
               ),
               const SizedBox(width: 8),
               Text(
-                'Compute Device',
+                'Compute Device'.tr,
                 style: TextStyle(
                   color: context.text,
                   fontSize: 15,
@@ -1015,7 +1053,7 @@ class _HardwareSettingsCardState extends State<_HardwareSettingsCard> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Current: $_currentConfigLabel',
+            '${'Current'.tr}: $_currentConfigLabel',
             style: TextStyle(color: context.textM, fontSize: 12),
           ),
           const SizedBox(height: 12),
@@ -1026,7 +1064,7 @@ class _HardwareSettingsCardState extends State<_HardwareSettingsCard> {
             child: ElevatedButton.icon(
               onPressed: _applyAutoConfig,
               icon: const Icon(Icons.tune_rounded, size: 16),
-              label: const Text('Apply Recommended Settings'),
+              label: Text('Apply Recommended Settings'.tr),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.accent,
                 foregroundColor: Colors.white,
@@ -1080,7 +1118,7 @@ class _HardwareSettingsCardState extends State<_HardwareSettingsCard> {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    'Manual Override',
+                    'Manual Override'.tr,
                     style: TextStyle(
                       color: context.textM,
                       fontSize: 13,
@@ -1110,7 +1148,7 @@ class _HardwareSettingsCardState extends State<_HardwareSettingsCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'GPU Layers',
+                  'GPU Layers'.tr,
                   style: TextStyle(color: context.text, fontSize: 14),
                 ),
                 Container(
@@ -1148,7 +1186,7 @@ class _HardwareSettingsCardState extends State<_HardwareSettingsCard> {
               ),
             ),
             Text(
-              'If the app crashes when loading a model, reduce GPU layers or switch to CPU. Reload the model after changing settings.',
+              'If the app crashes when loading a model, reduce GPU layers or switch to CPU. Reload the model after changing settings.'.tr,
               style: TextStyle(color: context.textD, fontSize: 11, height: 1.4),
             ),
           ],

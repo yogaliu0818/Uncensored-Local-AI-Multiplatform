@@ -368,7 +368,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Icons.chat_rounded,
                 color: AppColors.accent,
               ),
-              label: 'Chat',
+              label: 'Chat'.tr,
             ),
             NavigationDestination(
               icon: Icon(Icons.widgets_outlined, color: context.textM),
@@ -376,7 +376,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Icons.widgets_rounded,
                 color: AppColors.accent,
               ),
-              label: 'Models',
+              label: 'Models'.tr,
             ),
             NavigationDestination(
               icon: Icon(Icons.settings_outlined, color: context.textM),
@@ -384,7 +384,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Icons.settings_rounded,
                 color: AppColors.accent,
               ),
-              label: 'Settings',
+              label: 'Settings'.tr,
             ),
           ],
         ),
@@ -1070,7 +1070,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 1.4,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Ask anything...',
+                  hintText: 'Ask anything...'.tr,
                   hintStyle: TextStyle(color: context.textD),
                   border: InputBorder.none,
                   enabledBorder: InputBorder.none,

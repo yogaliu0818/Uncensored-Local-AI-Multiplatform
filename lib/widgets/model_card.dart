@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 import '../theme/app_colors.dart';
@@ -71,11 +72,11 @@ class ModelCard extends StatelessWidget {
                 _labelBadge(model.label, model.isUncensored),
                 if (model.badge.isNotEmpty)
                   _accentBadge(model.badge),
-                if (isLoaded) _statusBadge('LOADED', AppColors.green, Icons.check_circle),
+                if (isLoaded) _statusBadge('LOADED'.tr, AppColors.green, Icons.check_circle),
                 if (isLoadingModel)
-                  _statusBadge('LOADING', AppColors.orange, Icons.hourglass_top_rounded),
+                  _statusBadge('LOADING'.tr, AppColors.orange, Icons.hourglass_top_rounded),
                 if (isCurrentlyDownloading)
-                  _statusBadge('DOWNLOADING', AppColors.orange, Icons.downloading_rounded),
+                  _statusBadge('DOWNLOADING'.tr, AppColors.orange, Icons.downloading_rounded),
               ],
             ),
 
@@ -112,17 +113,17 @@ class ModelCard extends StatelessWidget {
                   children: [
                     Icon(Icons.memory_rounded, size: 14, color: context.textD),
                     const SizedBox(width: 4),
-                    Text('Min ${model.minRamGb} GB RAM',
+                    Text('${'Min'.tr} ${model.minRamGb} GB RAM',
                         style: TextStyle(fontSize: 12, color: context.textM)),
                   ],
                 ),
                 if (isDownloaded && !isCurrentlyDownloading)
-                  const Row(
+                  Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.check_circle_rounded, size: 14, color: AppColors.green),
                       SizedBox(width: 4),
-                      Text('Downloaded',
+                      Text('Downloaded'.tr,
                           style: TextStyle(fontSize: 12, color: AppColors.green)),
                     ],
                   ),
@@ -194,7 +195,7 @@ class ModelCard extends StatelessWidget {
             // Status message
             Expanded(
               child: Text(
-                loadingStatusMsg.isNotEmpty ? loadingStatusMsg : 'Loading...',
+                loadingStatusMsg.isNotEmpty ? loadingStatusMsg : 'Loading...'.tr,
                 style: TextStyle(fontSize: 12, color: context.textM),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -211,7 +212,7 @@ class ModelCard extends StatelessWidget {
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 icon: const Icon(Icons.stop_circle_outlined, size: 16),
-                label: const Text('Stop', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                label: Text('Stop'.tr, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
               ),
           ],
         ),
@@ -267,7 +268,7 @@ class ModelCard extends StatelessWidget {
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
               icon: const Icon(Icons.close_rounded, size: 14),
-              label: const Text('Cancel', style: TextStyle(fontSize: 11)),
+              label: Text('Cancel'.tr, style: const TextStyle(fontSize: 11)),
             ),
           ],
         ),
@@ -283,7 +284,7 @@ class ModelCard extends StatelessWidget {
               style: TextStyle(fontSize: 11, color: context.textM),
             ),
             Text(
-              '${ds.remainingStr} left',
+              '${ds.remainingStr} ${'left'.tr}',
               style: TextStyle(fontSize: 11, color: context.textD),
             ),
             if (ds.speedBytesPerSec > 0)
@@ -304,7 +305,7 @@ class ModelCard extends StatelessWidget {
       onPressed: onRemoveCustom,
       icon: const Icon(Icons.remove_circle_outline, size: 20),
       color: AppColors.red,
-      tooltip: 'Remove from library',
+      tooltip: 'Remove from library'.tr,
     );
 
     return Row(
@@ -314,7 +315,7 @@ class ModelCard extends StatelessWidget {
             child: ElevatedButton.icon(
               onPressed: onDownload,
               icon: const Icon(Icons.download_rounded, size: 16),
-              label: Text('Download (${model.sizeGb} GB)'),
+              label: Text('${'Download'.tr} (${model.sizeGb} GB)'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: context.isDark ? context.text : AppColors.accent,
                 foregroundColor: context.isDark ? context.bg : Colors.white,
@@ -334,7 +335,7 @@ class ModelCard extends StatelessWidget {
             child: ElevatedButton.icon(
               onPressed: onLoad,
               icon: const Icon(Icons.play_arrow_rounded, size: 18),
-              label: const Text('Load Model'),
+              label: Text('Load Model'.tr),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.green,
                 foregroundColor: Colors.white,
@@ -351,7 +352,7 @@ class ModelCard extends StatelessWidget {
               onPressed: onDelete,
               icon: const Icon(Icons.delete_outline_rounded, size: 20),
               color: context.textD,
-              tooltip: 'Delete model file',
+              tooltip: 'Delete model file'.tr,
             ),
         ],
 
@@ -360,7 +361,7 @@ class ModelCard extends StatelessWidget {
             child: OutlinedButton.icon(
               onPressed: null,
               icon: const Icon(Icons.check_circle_rounded, size: 16, color: AppColors.green),
-              label: const Text('Active', style: TextStyle(color: AppColors.green)),
+              label: Text('Active'.tr, style: const TextStyle(color: AppColors.green)),
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: AppColors.green),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -371,7 +372,7 @@ class ModelCard extends StatelessWidget {
           // Unload button
           if (onUnload != null)
             Tooltip(
-              message: 'Unload model from memory',
+              message: 'Unload model from memory'.tr,
               child: Material(
                 color: AppColors.orange.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(8),
