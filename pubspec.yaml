@@ -26,7 +26,7 @@ dependencies:
   # ── File System ─────────────────────────────────────────────────
   path_provider: ^2.1.5            # App documents / downloads dir
   path: ^1.9.1                     # Path string utilities
-  file_picker: ^8.1.7              # Cross-platform file/folder picker
+  file_picker: ^10.2.0             # Cross-platform file/folder picker
 
   # ── UI Helpers ───────────────────────────────────────────────────
   flutter_markdown: ^0.7.6         # Render AI markdown responses
@@ -38,7 +38,6 @@ dependencies:
   # ── Background / Wake Lock ─────────────────────────────────────
   wakelock_plus: ^1.2.10             # Keep screen on during downloads
   flutter_foreground_task: ^9.2.2    # Foreground service for downloads/inference
-  disable_battery_optimization: ^1.1.1 # Guide users to disable battery optimization
 
 dev_dependencies:
   flutter_test:
