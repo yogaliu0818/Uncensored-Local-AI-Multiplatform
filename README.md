@@ -1,4 +1,4 @@
-# Uncensored Local AI — 離線本機 AI
+# 無審核破甲模型
 
 [English](README.en.md)
 
