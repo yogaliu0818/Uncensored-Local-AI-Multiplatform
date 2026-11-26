@@ -1,158 +1,122 @@
-# Uncensored Local AI — Offline Edition
+# Uncensored Local AI — 離線本機 AI
 
-以 Flutter 與 llama.cpp/llamadart 建立的跨平台本機 AI 聊天程式。模型以 GGUF 格式載入，在 Windows、Android、macOS 或 Linux 的本機硬體上推理。
+[English](README.en.md)
 
-本版本專注於本機模型、離線推理與不依賴雲端 AI 帳號。模型下載完成後，聊天內容不需要送到遠端 AI 服務。
+使用 Flutter 與 `llamadart`／`llama.cpp` 建立的跨平台本機 AI 聊天程式。模型以 GGUF 格式在自己的電腦或 Android 手機上執行，不需要付費雲端 AI API。
 
-> 這是基於原始專案 [techjarves/Uncensored-Local-AI-Multiplatform](https://github.com/techjarves/Uncensored-Local-AI-Multiplatform) 的本機客製版。
+> 本專案是基於 [techjarves/Uncensored-Local-AI-Multiplatform](https://github.com/techjarves/Uncensored-Local-AI-Multiplatform) 的客製版本。
 
 ## 功能
 
 - GGUF 模型下載、匯入、載入、切換與卸載
-- Windows、Android、macOS、Linux Flutter 介面
-- CPU、Vulkan、OpenCL 與 CUDA backend 選擇（依平台與驅動支援情況）
-- GPU Layers、上下文長度與溫度調整
-- 即時 Token/s、載入進度與模型狀態
-- 聊天記錄本機保存
-- 強制繁體中文選項與全域 System Prompt
-- 模型切換時完整釋放原生推理資源
-- 自動清理 GGUF 控制標記與異常角色標記
-- 可選的 localhost OpenAI 相容 API，僅供同一台電腦上的本機工具使用
+- Windows、Android、macOS、Linux
+- CPU、Vulkan、OpenCL 與 CUDA backend（依平台與驅動支援情況）
+- GPU Layers、上下文長度與 Temperature 調整
+- Token/s、模型載入進度與狀態顯示
+- 聊天記錄儲存在本機
+- 繁體中文強制回覆與全域 System Prompt
+- 介面語言：繁體中文、英文、日文、韓文、西班牙文、法文、德文
+- 可選的 localhost OpenAI 相容 API
 
 ## 與原版的差異
 
 | 項目 | 原版 | 本版本 |
 |---|---|---|
-| 本機聊天 | 基本本機模型聊天 | 保留並改善模型生命週期與錯誤處理 |
-| 硬體設定 | 基本 GPU 設定 | 增加 CPU／Vulkan／OpenCL／CUDA 選擇與 Layers 調整 |
-| 上下文 | 固定或較少設定 | 可調整 2048、4096、8192，並自動裁切舊對話 |
-| 語言 | 依模型自行決定 | 增加繁體中文強制選項與全域 System Prompt |
-| 效能資訊 | 有限 | 顯示載入狀態與 Token/s |
-| 穩定性 | 基本載入流程 | 切換模型時完整釋放 engine/backend，降低載入失敗機率 |
-| 輸出處理 | 基本輸出 | 清除常見 Chat Template 控制標記 |
-| 遠端服務 | 依原版功能 | **不包含 VPS、Nexus、Tailscale、Bearer API 或 SearXNG 部署** |
+| 介面語言 | 主要依原始介面 | 新增多語系與繁體中文體驗 |
+| 硬體設定 | 基本設定 | CPU／Vulkan／OpenCL／CUDA 與 GPU Layers |
+| 上下文 | 設定較少 | 可調整 2048、4096、8192 |
+| 模型生命週期 | 基本載入流程 | 切換模型時釋放原生推理資源 |
+| 輸出處理 | 基本輸出 | 清理常見 Chat Template 控制標記 |
+| 遠端服務 | 依原版功能 | 不包含 VPS、Nexus、Tailscale、Bearer API 或 SearXNG 部署 |
 
-本版本保留的 localhost API 是本機整合用途；預設不對外網卡開放，也不提供遠端部署設定。
+本版本的 API 預設只監聽 `127.0.0.1`，供同一台裝置上的本機工具使用。
 
 ## 支援模型
 
-內建模型清單位於 [`assets/models_catalog.json`](assets/models_catalog.json)。目前包含：
+內建模型清單位於 [`assets/models_catalog.json`](assets/models_catalog.json)。模型大小為約略值，實際下載檔案大小依量化版本而定。
 
-| 模型 | 約略大小 | 適合用途 |
-|---|---:|---|
-| Gemma 2 2B | 1.6 GB | 記憶體較少、快速回覆 |
-| Gemma 4 E4B Heretic | 5.3 GB | 較高品質的本機對話 |
-| Dolphin 2.9 Llama 3 8B | 4.9 GB | 角色扮演與較開放的回答風格 |
-| Phi-3.5 Mini 3.8B | 2.2 GB | 輕量、快速回覆 |
+| 模型 | 約略大小 | 最低 RAM | 適合用途 |
+|---|---:|---:|---|
+| Gemma 2 2B | 1.6 GB | 4 GB | 記憶體較少、快速回覆 |
+| Gemma 4 E4B Heretic | 5.3 GB | 8 GB | 較高品質的本機對話 |
+| Dolphin 2.9 Llama 3 8B | 4.9 GB | 8 GB | 角色扮演與較開放的回答風格 |
+| Phi-3.5 Mini 3.8B | 2.2 GB | 4 GB | 輕量、快速回覆 |
 
 實際效能取決於量化格式、系統 RAM、顯存、GPU backend、GPU Layers 與上下文長度。
 
-## Windows 安裝
+## 支援平台與下載
 
-### 必要環境
+前往 [GitHub Releases](https://github.com/yogaliu0818/Uncensored-Local-AI-Multiplatform/releases) 下載：
 
-1. Windows 10 或 Windows 11
-2. [Flutter SDK](https://docs.flutter.dev/get-started/install/windows)
-3. Visual Studio 2022 或更新版本
-4. Visual Studio Installer 中勾選 **Desktop development with C++**
-5. 啟用 Windows Developer Mode，以支援 Flutter plugin symlink
+- Windows x64：解壓縮 ZIP 後執行 `portable_ai_flutter.exe`
+- Android：依手機 CPU 選擇 ARM64、ARMv7 或 x86_64 APK
+- macOS：解壓縮 ZIP 後開啟 App
+- Linux x64：解壓縮 `.tar.gz` 後執行 bundle 中的程式
 
-確認環境：
+## 從原始碼建置
 
-```powershell
-flutter doctor -v
-```
-
-### 從原始碼執行
+需要 Flutter SDK。Windows 桌面版另外需要 Visual Studio 2022 的 **Desktop development with C++**；Android 需要 Android SDK。
 
 ```powershell
 git clone https://github.com/yogaliu0818/Uncensored-Local-AI-Multiplatform.git
 cd Uncensored-Local-AI-Multiplatform
 flutter pub get
+```
+
+```powershell
+# Windows
 flutter run -d windows
-```
-
-建立 Windows Release：
-
-```powershell
 flutter build windows --release
-```
 
-輸出位置：`build\windows\x64\runner\Release\`
-
-## Android 安裝與建置
-
-需要 Flutter SDK、Android SDK、Android Studio 與可用的 Android 裝置或模擬器。
-
-```powershell
-flutter pub get
+# Android
 flutter devices
 flutter run -d <device-id>
-flutter build apk --release
+flutter build apk --release --split-per-abi
 ```
 
-模型檔案可能比 APK 大很多，請預留足夠儲存空間與 RAM。手機若載入失敗，先改用較小的 Gemma 2 2B 或降低上下文長度。
+```bash
+# macOS / Linux
+flutter pub get
+flutter build macos --release
+flutter build linux --release
+```
 
 ## 第一次使用
 
-1. 啟動程式。
-2. 開啟 **Models**。
-3. 下載或匯入 GGUF 模型。
-4. 點擊模型的 **Load**。
-5. 回到聊天頁開始對話。
-6. 在 **Settings → Hardware Configuration** 選擇 backend 與 GPU Layers。
-7. 在 **Settings → Language & Context** 開啟 **Force Traditional Chinese**。
+1. 開啟 App，進入 **Models／模型**。
+2. 下載或匯入 GGUF 模型。
+3. 點擊 **Load Model／載入模型**，回到聊天頁。
+4. 到 **Settings／設定 → Language／介面語言** 選擇語言。
+5. 到 **Language & Context／語言與上下文** 開啟強制繁體中文或調整上下文。
+6. 到 **Hardware Configuration／硬體設定** 選擇 backend 與 GPU Layers。
 
-切換模型前，先等待目前模型卸載完成；大型模型需要較長的載入時間。
+## 模型與硬體建議
 
-## 硬體設定建議
+- 記憶體較少：先使用 Gemma 2 2B 或 Phi-3.5 Mini 3.8B。
+- RTX 3050 Laptop 6 GB：4B～8B Q4 模型可先嘗試 Vulkan，GPU Layers 從 20～33 開始。
+- 手機：先使用較小模型與 2048／4096 上下文。
+- 載入失敗或閃退：降低 GPU Layers、改用 CPU 或降低上下文長度。
+- 上下文越大，能保留的對話越多，但會增加 RAM／VRAM 使用量並降低速度。
 
-### RTX 3050 Laptop 6 GB 顯存
+## 本機 API
 
-- 4B～8B Q4 模型可以嘗試 Vulkan
-- GPU Layers 先從 20～33 開始，再逐步增加
-- 若載入失敗或系統開始大量使用虛擬記憶體，降低 Layers 或上下文
-- 8B 模型通常比 3.8B 模型慢，但不一定在所有任務都更準
-
-### CPU 模式
-
-CPU 模式相容性最高，但速度通常較慢；適合 Vulkan/OpenCL 初始化失敗時排查問題。
-
-### 上下文長度
-
-上下文越大，能記住的對話越多，但會增加 RAM/VRAM 使用量與速度負擔。建議從 4096 開始。
-
-## 繁體中文與 System Prompt
-
-在設定中開啟 **Force Traditional Chinese**，並可在 **Global System Prompt** 放入：
-
-```text
-You must always reply in Taiwanese Traditional Chinese (繁體中文).
-Do not answer in English or Simplified Chinese unless the user explicitly requests another language.
-```
-
-修改語言設定後建議建立新對話，避免沿用舊對話保存的 System Prompt。
-
-## 本機 API（可選）
-
-本功能只給同一台電腦上的本機工具使用，不包含遠端部署設定。
-
-1. 載入模型。
-2. 到 **Settings → Local API Server**。
-3. 保持 **Allow External Connections** 關閉。
-4. 本機 Base URL 為：
+載入模型後，在 **Settings → Local API Server** 開啟。預設網址：
 
 ```text
 http://127.0.0.1:4891/v1
 ```
 
-本離線版本不提供手機或其他電腦的遠端連線設定。
+本專案不提供遠端部署設定；若開啟外部連線，請自行確認防火牆與網路安全。
 
 ## 常見問題
 
-### Unable to find suitable Visual Studio toolchain
+### Tokenization failed or prompt too long
 
-安裝 Visual Studio 的 **Desktop development with C++** 工作負載，然後重新執行：
+降低上下文長度、建立新對話，或改用較小模型。
+
+### Windows 找不到 Visual Studio toolchain
+
+在 Visual Studio Installer 安裝 **Desktop development with C++**，再執行：
 
 ```powershell
 flutter doctor -v
@@ -166,35 +130,21 @@ flutter doctor -v
 start ms-settings:developers
 ```
 
-### Tokenization failed or prompt too long
-
-降低上下文長度、建立新對話，或改用較小模型。
-
-### 模型載入失敗或速度很慢
-
-- 確認 GPU backend 與驅動支援情況
-- 降低 GPU Layers
-- 降低上下文長度
-- 關閉其他大型程式
-- 先用 Phi-3.5 Mini 或 Gemma 2 2B 測試
-
 ## 開發驗證
 
 ```powershell
-flutter pub get
 flutter analyze
 flutter test
-flutter build windows --debug
+flutter build windows --release
 ```
 
 ## 授權
 
-本專案沿用原始專案的 MIT License。模型權重可能有各自的授權條款，下載與使用前請查看模型來源頁面。
+本專案沿用原始專案的 MIT License。模型權重可能有各自授權條款，請查看模型來源頁面。
 
 ## 致謝
 
-- 原始專案：[techjarves/Uncensored-Local-AI-Multiplatform](https://github.com/techjarves/Uncensored-Local-AI-Multiplatform)
-- Flutter
-- llama.cpp
-- llamadart
-- GGUF 模型作者與量化作者
+- [原始專案](https://github.com/techjarves/Uncensored-Local-AI-Multiplatform)
+- [Flutter](https://flutter.dev/)
+- [llama.cpp](https://github.com/ggml-org/llama.cpp)
+- [llamadart](https://pub.dev/packages/llamadart)
